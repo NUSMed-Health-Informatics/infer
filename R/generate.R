@@ -142,10 +142,20 @@ bootstrap <- function(x, reps = 1, ...) {
 
 #' @importFrom dplyr bind_rows group_by
 permute <- function(x, reps = 1, ...) {
+
+  if(!is.null(attr(x,"subject"))) { 
+
+  df_out <- replicate(reps, permute_once_within(x), simplify = FALSE) %>%
+    dplyr::bind_rows() %>%
+    dplyr::mutate(replicate = rep(1:reps, each = nrow(x))) %>%
+    dplyr::group_by(replicate)
+  
+  } else {
   df_out <- replicate(reps, permute_once(x), simplify = FALSE) %>%
     dplyr::bind_rows() %>%
     dplyr::mutate(replicate = rep(1:reps, each = nrow(x))) %>%
     dplyr::group_by(replicate)
+  }
 
   df_out <- copy_attrs(to = df_out, from = x)
 
@@ -161,6 +171,22 @@ permute_once <- function(x, ...) {
     y_prime <- sample(y, size = length(y), replace = FALSE)
     x[response_name(x)] <- y_prime
     return(x)
+  } else {
+    stop_glue(
+      "Permuting should be done only when doing independence hypothesis test. ",
+      "See `hypothesize()`."
+    )
+  }
+}
+
+permute_once_within <- function(x, ...) {
+  dots <- list(...)
+
+  if (is_hypothesized(x) && (attr(x, "null") == "independence")) {
+       x %>% dplyr::group_by_at(attr(x, "subject")) %>% 
+             dplyr::group_modify(~mutate(.,!!attr(x, "response"):=sample(!!attr(x, "response")))) %>%
+             dplyr::ungroup() %>% 
+             return 
   } else {
     stop_glue(
       "Permuting should be done only when doing independence hypothesis test. ",

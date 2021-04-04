@@ -16,6 +16,9 @@
 #'   This is an alternative to using the `formula` argument.
 #' @param explanatory The variable name in `x` that will serve as the
 #'   explanatory variable. This is an alternative to using the formula argument.
+#' @param subject For responses from subjects with repeated measures, the column
+#'   with the identifier can be specified so that the responses will be permuted
+#'   per subject.
 #' @param success The level of `response` that will be considered a success, as
 #'   a string. Needed for inference on one proportion, a difference in
 #'   proportions, and corresponding z stats.
@@ -47,7 +50,7 @@
 #' @importFrom methods hasArg
 #' @export
 specify <- function(x, formula, response = NULL,
-                    explanatory = NULL, success = NULL) {
+                    explanatory = NULL, subject = NULL, success = NULL) {
   check_type(x, is.data.frame)
 
   # Standardize variable types
@@ -72,6 +75,7 @@ specify <- function(x, formula, response = NULL,
   } else {
     attr(x, "explanatory_type") <- class(explanatory_variable(x))
   }
+  if(!is.null(subject)) { attr(x, "subject") <- subject } # process subject option
   
   check_success_arg(x, success)
   
