@@ -83,8 +83,19 @@ specify <- function(x, formula, response = NULL,
   x <- set_params(x)
 
   # Select variables
+  
+  if(!is.null(subject)) {
+
+  x <- x %>%
+
+    select(one_of(c(response_name(x), explanatory_name(x), subject)))
+
+  } else {
+
   x <- x %>%
     select(one_of(c(response_name(x), explanatory_name(x))))
+ 
+  }
 
   is_complete <- stats::complete.cases(x)
   if (!all(is_complete)) {
