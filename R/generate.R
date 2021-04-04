@@ -182,8 +182,8 @@ permute_once <- function(x, ...) {
 permute_once_within <- function(x, ...) {
   dots <- list(...)
 
-  print(attr(x, "subject"))  
-  print(head(x))
+  #print(attr(x, "subject"))  
+  #print(head(x))
 
   if (is_hypothesized(x) && (attr(x, "null") == "independence")) {
        x %>% dplyr::group_by_at(attr(x, "subject")) %>% 
